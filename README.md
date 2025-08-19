@@ -56,3 +56,31 @@ Resulting Performance:
   - Switching Energy: 0.186 pJ
   - Response Time: 3.000 ns
 ```
+
+## References
+
+This project’s initial models are based on simplified analytic forms of saturable absorption and Kerr nonlinearity, with parameters inspired by published literature. The following papers provide the physical basis for the code:
+
+### Saturable Absorption (MoS₂, WS₂, other TMDs)
+- **Yin et al.**, *Edge nonlinear optics on a MoS₂ atomic monolayer*, Science 344, 488–490 (2014).  
+  → Demonstrates strong nonlinear optical response in monolayer MoS₂.  
+- **Zhang et al.**, *MoS₂ as a broadband saturable absorber for ultrafast photonics*, Optics Express 22, 7249–7260 (2014).  
+  → Shows MoS₂ operating as a broadband saturable absorber with measurable \(I_\text{sat}\), modulation depth.  
+- **Cui et al.**, *Layer-dependent nonlinear optical properties of ReS₂ and related TMDs*, Sci. Rep. 6, 33306 (2016).  
+  → Highlights thickness-dependent saturable absorption, supporting our use of “layers” as a parameter.
+
+### Kerr Nonlinearity (Graphene)
+- **Thakur et al.**, *Experimental characterization of the effective Kerr coefficient in graphene*, Sci. Rep. 9, 12358 (2019).  
+  → Provides experimental values of \(n_2\) across wavelengths and conditions.  
+- **Soh et al.**, *Comprehensive analysis of the optical Kerr coefficient of graphene*, Phys. Rev. A 94, 033849 (2016).  
+  → Theoretical treatment of graphene’s third-order nonlinear response.  
+- **Zhang et al.**, *Large Kerr nonlinearity of graphene*, arXiv:1203.5527 (2012).  
+  → Reports orders-of-magnitude larger Kerr effect compared to dielectrics.
+
+### General Nonlinear Optics
+- **Boyd, R. W.**, *Nonlinear Optics*, 3rd ed. (Academic Press, 2008).  
+  → Standard reference for saturable absorption, Kerr effect, and χ³ processes.  
+- **Wikipedia contributors**, *Saturable absorption* and *Kerr effect* (accessed 2025).  
+  → For quick reference to standard analytic forms used in the models.
+
+---

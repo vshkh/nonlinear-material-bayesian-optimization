@@ -29,6 +29,7 @@ Different materials (e.g. MoS₂, WS₂, Graphene) exhibit nonlinear optical res
 
 ## Example Output
 
+```
 (...)
   - Simulating: MOS2, Layers: 4, Lambda: 1403nm, Q: 108.7, Gamma: 0.11 -> Score: 3.3825e-03
   - Simulating: WS2, Layers: 4, Lambda: 1516nm, Q: 875.8, Gamma: 0.11 -> Score: 6.8982e-03
@@ -54,3 +55,4 @@ Resulting Performance:
   - Knee Intensity: 6.20e+05 W/m^2
   - Switching Energy: 0.186 pJ
   - Response Time: 3.000 ns
+```

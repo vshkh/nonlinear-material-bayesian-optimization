@@ -4,9 +4,9 @@ types.py
 Define a class for materials to store its properties for simulation.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Literal, Optional
+from typing import List, Literal, Optional, Tuple
 import numpy as np
 
 class Material(str, Enum):
@@ -18,6 +18,11 @@ class Sourcing(str, Enum):
     COMMERCIAL = "Commercial"
     LAB = "Lab-Synthesized"
     EXPERIMENTAL = "Experimental"
+
+class NonlinearEffect(str, Enum):
+    """A registry of all possible nonlinear effects the simulator can model."""
+    SATURABLE_ABSORPTION = "Saturable Absorption"
+    KERR = "Kerr Effect"
 
 """
 Input parameters for simulation.
@@ -58,6 +63,7 @@ class KPIs:
 class MaterialProperties:
     name: Material
     sourcing: Sourcing
+    active_effects: Tuple[NonlinearEffect, ...] # The list of active effects for this material
     n: float                   # real refractive index
     k: float                   # extinction coefficient (imag part)
     n2: float                  # nonlinear index [m^2/W] (Kerr path)

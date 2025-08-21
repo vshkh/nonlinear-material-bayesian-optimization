@@ -64,11 +64,20 @@ class MaterialProperties:
     name: Material
     sourcing: Sourcing
     active_effects: Tuple[NonlinearEffect, ...] # The list of active effects for this material
-    n: float                   # real refractive index
-    k: float                   # extinction coefficient (imag part)
-    n2: float                  # nonlinear index [m^2/W] (Kerr path)
     layer_thickness_nm: float  # single-layer thickness in nm
-    # ---- Optional model-specific defaults (may be None; can be overridden by data) ----
-    Isat_W_m2: Optional[float] = None   # Saturation intensity for SA/PC if known
+    
+    # Wavelength-dependent properties (dictionary mapping lambda_nm to value)
+    n: dict[int, float]                   # real refractive index
+    k: dict[int, float]                   # extinction coefficient (imag part)
+    n2: dict[int, float]                  # nonlinear index [m^2/W] (Kerr path)
+    Isat_W_m2: dict[int, float]   # Saturation intensity for SA/PC if known
+
+    # Other properties
+    linear_absorption_coefficient: Optional[float] = None # linear absorption coefficient [m^-1]
+    anisotropy_type: Optional[str] = None # e.g., 'uniaxial'
+    n_ordinary: Optional[dict[int, float]] = None # ordinary refractive index
+    n_extraordinary: Optional[dict[int, float]] = None # extraordinary refractive index
+    sellmeier_coefficients: Optional[dict] = None # Sellmeier coefficients for dispersion
     tau_s: Optional[float] = None       # Response time [s]
     saturable_fraction: Optional[float] = None  # Fraction of low-intensity absorption that saturates (0..1)
+    references: dict[str, str] = field(default_factory=dict) # a dict to store references for the data

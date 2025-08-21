@@ -17,6 +17,13 @@ from .models import (
     contrast as kpi_contrast, knee_intensity_by_fraction
 )
 
+def get_wavelength_dependent_value(prop: dict, lambda_nm: int):
+    """Finds the value for the closest wavelength in the dictionary."""
+    if not prop:
+        return None
+    closest_lambda = min(prop.keys(), key=lambda k: abs(k - lambda_nm))
+    return prop[closest_lambda]
+
 def simulate(params: Params) -> KPIs:
     """
     This is the main simulation function.
@@ -26,7 +33,24 @@ def simulate(params: Params) -> KPIs:
     props = MATERIALS_DATABASE[params.material]
     I = np.logspace(2, 8, 300)  # W/m^2
     lambda_m = params.lambda_nm * 1e-9
+    lambda_um = params.lambda_nm * 1e-3 # for Sellmeier
     t_total = layers_to_total_thickness(props.layer_thickness_nm, params.layers)
+
+    # --- Wavelength-dependent parameters ---
+    n = get_wavelength_dependent_value(props.n, params.lambda_nm)
+    k = get_wavelength_dependent_value(props.k, params.lambda_nm)
+    n2 = get_wavelength_dependent_value(props.n2, params.lambda_nm)
+    Isat = get_wavelength_dependent_value(props.Isat_W_m2, params.lambda_nm)
+
+    # --- Refractive Index Calculation ---
+    n_effective = n
+    if props.sellmeier_coefficients:
+        n_effective = calculate_n_from_sellmeier(props.sellmeier_coefficients, lambda_um)
+    elif props.anisotropy_type == 'uniaxial':
+        # For uniaxial, n_effective depends on polarization and propagation angle.
+        # This is a placeholder for a more complex model.
+        # For now, we'll assume the user provides the correct effective index.
+        pass
 
     # --- Simulation Pipeline ---
     # Initialize baseline transmission and phase. We start with a perfectly
@@ -40,11 +64,14 @@ def simulate(params: Params) -> KPIs:
         if effect == NonlinearEffect.SATURABLE_ABSORPTION:
             # --- Apply Saturable Absorption Effect ---
             # This effect modifies the device's transmission (loss).
-            A0 = small_signal_absorption_from_k(props.k, lambda_m, t_total)
+            if props.linear_absorption_coefficient is not None:
+                A0 = props.linear_absorption_coefficient * t_total
+            else:
+                A0 = small_signal_absorption_from_k(k, lambda_m, t_total)
+            
             f_sat = props.saturable_fraction if props.saturable_fraction is not None else 0.6
             alpha0 = f_sat * A0
             alpha_ns = (1.0 - f_sat) * A0
-            Isat = props.Isat_W_m2 if props.Isat_W_m2 is not None else 1e6
             
             # This transmission is multiplied with the running total.
             total_transmission *= sa_T(I, alpha0=alpha0, alpha_ns=alpha_ns, Isat=Isat)
@@ -56,8 +83,8 @@ def simulate(params: Params) -> KPIs:
             FE = 1.0 + 0.002 * max(0.0, float(params.Q))
             
             # This phase shift is added to the running total.
-            total_phase_shift += kerr_phi(I * Gamma, n2=props.n2, L_int_m=params.L_int_um * 1e-6,
-                                        lambda_m=lambda_m, field_enhance=FE)
+            total_phase_shift += kerr_phi(I * Gamma, n2=n2, L_int_m=params.L_int_um * 1e-6,
+                                        lambda_m=lambda_m, field_enhance=FE, n_eff=n_effective)
 
     # --- Combine Effects ---
     # After all effects are accumulated, we convert the final phase shift into

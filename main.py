@@ -93,7 +93,8 @@ def main():
     result = gp_minimize(
         func=objective_function, 
         dimensions=space, 
-        n_calls=50, 
+        n_calls=200, 
+        n_jobs=-1, 
         random_state=42
     )
 
